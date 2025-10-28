@@ -2,3 +2,6 @@
 /.github/
 /.venv/
 /.idea/
+__pycache__
+work
+
