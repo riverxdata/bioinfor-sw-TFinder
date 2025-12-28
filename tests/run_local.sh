@@ -2,6 +2,7 @@
 # simulate job directory
 export BASEDIR=$PWD
 export RIVER_HOME=$PWD/work
+export PIXI_HOME=$RIVER_HOME/pixi
 export job_id="job_id"
 mkdir -p $RIVER_HOME/jobs/job_id
 cp $PWD/tests/params.json $RIVER_HOME/jobs/job_id/params.json
@@ -9,16 +10,10 @@ cd $RIVER_HOME/jobs/job_id
 ###########################################################################################################################
 # Simulate flow of job script
 echo "Checking requirements"
-which micromamba || (echo "micromamba not found. Please install micromamba and try again." && exit 1)
-
-# Install dependencies
-if ! micromamba env list | grep -q 'river'; then
-    micromamba create -y -n river python=3.12 conda-forge::singularity=3.8.6 bioconda::nextflow jq git -y
-fi
-
-# Activate environment
-eval "$(micromamba shell hook --shell bash)"
-micromamba activate river
+which pixi || curl -fsSL https://pixi.sh/install.sh | sh
+pixi config append default-channels bioconda --global
+pixi config append default-channels conda-forge --global           
+pixi global install nextflow jq git singularity python=3.14
 
 # Setup networking
 export PORT=$(python -c "import socket; s=socket.socket(); s.bind(('',0)); print(s.getsockname()[1]); s.close()")
